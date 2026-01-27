@@ -1,0 +1,111 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\title{Automatic Measurement of Fetal Head Circumference from Ultrasound Images Using Deep Learning}
+
+\author{
+\IEEEauthorblockN{Pham Minh Duc (22BA13083)}
+\IEEEauthorblockA{
+Machine Learning in Medicine 2026 \\
+University of Science and Technology of Hanoi (USTH) \\
+Email: ducpm.22ba13083@usth.edu.vn}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Measuring fetal head circumference (HC) accurately from ultrasound images is important for tracking fetal growth and identifying possible health problems during pregnancy. However, manual measurement takes a lot of time and may differ between doctors. This study explores an automatic method to estimate fetal head circumference using deep learning. A convolutional neural network (CNN) is trained on the public HC18 dataset to predict head circumference values directly from ultrasound images. The performance of the model is evaluated using Mean Absolute Error (MAE). The results show that this end-to-end regression approach is possible, but they also reveal challenges such as model underfitting and differences in the dataset.
+\end{abstract}
+
+\section{Introduction}
+Fetal biometry plays an important role in prenatal care, and head circumference is one of the main indicators used to assess fetal growth and gestational age. Ultrasound imaging is commonly used because it is safe, non-invasive, and provides real-time results. However, measuring head circumference manually depends heavily on the experience of the operator and can lead to inconsistent results.
+
+With recent advances in machine learning, deep learning models, especially convolutional neural networks, have shown strong results in medical image analysis. This study investigates a deep learning regression approach that directly predicts fetal head circumference from ultrasound images without the need for explicit image segmentation.
+
+\section{Dataset}
+This study uses the HC18 dataset, which is a publicly available benchmark for fetal head circumference measurement. The dataset contains two-dimensional ultrasound images with ground truth head circumference values measured in millimeters.
+
+The dataset includes:
+\begin{itemize}
+    \item A labeled training set with ultrasound images and head circumference annotations.
+    \item A separate unlabeled test set used for inference.
+\end{itemize}
+
+To evaluate the performance of the model, the labeled data is divided into training (80\%) and validation (20\%) subsets.
+
+\section{Methods}
+\subsection{Preprocessing}
+All ultrasound images are converted to grayscale, normalized to the range [0,1], and resized to $256 \times 256$ pixels. Each image is represented as a single-channel tensor.
+
+\subsection{Model Architecture}
+A convolutional neural network is designed for the regression task. The model includes three convolutional layers with ReLU activation and max pooling, followed by an adaptive average pooling layer and a fully connected regression layer. The network produces a single continuous value that represents the fetal head circumference.
+
+\subsection{Training Procedure}
+The model is trained using the Adam optimizer with a learning rate of $10^{-4}$. Mean Absolute Error (MAE) is chosen as the loss function because it is easy to interpret in a clinical context. The training process runs for 20 epochs with a batch size of 8.
+
+\section{Results}
+
+\subsection{Training and Validation Performance}
+Figure~\ref{fig:mae} shows the training and validation MAE across epochs. The relatively flat curves indicate limited learning progress, suggesting underfitting.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{Output/output1}
+\caption{Training and validation MAE over epochs.}
+\label{fig:mae}
+\end{figure}
+
+\subsection{Prediction Accuracy}
+Figure~\ref{fig:scatter} presents a scatter plot of predicted versus ground truth head circumference values on the validation set. The red dashed line represents the ideal prediction ($y=x$). Predictions cluster around a narrow range, indicating regression toward the mean.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{Output/output2}
+\caption{Predicted versus ground truth head circumference values.}
+\label{fig:scatter}
+\end{figure}
+
+\subsection{Error Distribution}
+The distribution of absolute prediction errors is shown in Figure~\ref{fig:hist}. While some predictions exhibit low error, a long tail of large errors is observed.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{Output/output3}
+\caption{Distribution of absolute prediction errors.}
+\label{fig:hist}
+\end{figure}
+
+\subsection{Qualitative Results}
+Figure~\ref{fig:examples} displays example ultrasound images from the validation set along with their ground truth and predicted head circumference values. The model performs better on mid-range values but struggles with extreme cases.
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=\textwidth]{Output/output4}
+\caption{Example fetal head circumference predictions on ultrasound images.}
+\label{fig:examples}
+\end{figure*}
+
+\section{Discussion}
+The experimental results show that the proposed CNN can learn basic relationships between the appearance of ultrasound images and head circumference. However, the consistently high MAE and the clustering of predictions suggest that the model is underfitting.
+
+Possible reasons for this include limited model capacity, large differences in ultrasound image quality, and the lack of explicit anatomical constraints. Performance may be improved by using data augmentation, deeper network architectures, or combining segmentation with regression.
+
+\section{Conclusion}
+This study presents a deep learning regression approach for automatically estimating fetal head circumference from ultrasound images. Although the current model shows limited accuracy, it provides a baseline for future research. Future work will focus on improving the model architecture and preprocessing methods to reach clinically acceptable performance.
+
+\section{References}
+\begin{thebibliography}{1}
+
+\bibitem{zenodo-hc18}
+T. L. A. van den Heuvel, D. de Bruijn, C. L. de Korte, and B. van Ginneken, “Automated measurement of fetal head circumference using 2D ultrasound images,” HC18 dataset, Zenodo, DOI: 10.5281/zenodo.1327317, 2018. [Online]. Available: https://zenodo.org/records/1327317. :contentReference[oaicite:2]{index=2}
+
+\bibitem{hc18-grand-challenge}
+HC18 Grand Challenge, “Automated measurement of fetal head circumference,” Grand-Challenge.org. [Online]. Available: https://hc18.grand-challenge.org/. Accessed: Oct. 25, 2025. :contentReference[oaicite:3]{index=3}
+
+\end{thebibliography}
+
+\end{document}
