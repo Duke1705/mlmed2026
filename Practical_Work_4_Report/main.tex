@@ -1,0 +1,135 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{subcaption}
+
+\graphicspath{{output/}}
+
+\title{Automatic Pulmonary Nodule Detection from CT Scans Using a 3D Convolutional Neural Network}
+
+\author{
+\IEEEauthorblockN{Pham Minh Duc (22BA13083)}
+\IEEEauthorblockA{
+Machine Learning in Medicine 2026 \\
+University of Science and Technology of Hanoi (USTH) \\
+Email: ducpm.22ba13083@usth.edu.vn}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Early detection of pulmonary nodules in computed tomography (CT) scans is very important for lung cancer screening. However, checking 3D CT volumes manually takes a lot of time and depends on the experience of radiologists. In this study, we propose an automatic method for pulmonary nodule detection using a 3D convolutional neural network (3D CNN). CT volumes in MetaImage format are processed to extract normalized 3D patches around annotated locations. The model is trained using Binary Cross-Entropy loss to classify nodule candidates. The results show that the model can learn useful volumetric features, but more improvements are still needed for reliable clinical use.
+\end{abstract}
+
+\section{Introduction}
+Lung cancer is one of the main causes of cancer death in the world. Pulmonary nodules that appear in chest CT scans can be early signs of lung cancer. Detecting these nodules manually is difficult because a CT scan contains many slices and small nodules can be missed easily.
+
+Recently, deep learning methods have shown strong performance in medical image analysis. In particular, 3D convolutional neural networks are suitable for CT data because they can learn spatial information across slices. In this work, we study a lightweight 3D CNN model for automatic pulmonary nodule detection using CT patches.
+
+\section{Dataset}
+This study uses CT scans and annotations derived from the LUNA16 framework. The data consists of volumetric chest CT scans stored in MetaImage (.mhd/.raw) format together with a CSV file that contains candidate nodule coordinates in world space.
+
+The dataset includes:
+\begin{itemize}
+    \item Volumetric chest CT scans
+    \item Annotation file with candidate nodule locations
+\end{itemize}
+
+Only scans that match the annotation file are used in the experiments.
+
+\section{Methods}
+
+\subsection{Preprocessing}
+Each CT volume is processed using the following steps:
+\begin{itemize}
+    \item Load CT volume using SimpleITK
+    \item Convert world coordinates to voxel coordinates
+    \item Extract $32 \times 32 \times 32$ 3D patches centered at candidates
+    \item Clip Hounsfield units to $[-1000, 400]$
+    \item Normalize intensities to $[0,1]$
+\end{itemize}
+
+Each patch is represented as a single-channel 3D tensor.
+
+\subsection{Model Architecture}
+A compact 3D convolutional neural network is used for binary classification. The network contains three convolutional blocks with ReLU activation and max pooling, followed by adaptive average pooling and a fully connected sigmoid layer that outputs the probability of a nodule.
+
+\subsection{Training Procedure}
+The model is trained using the Adam optimizer with a learning rate of $10^{-4}$. Binary Cross-Entropy (BCE) is used as the loss function. Training is performed for several epochs using mini-batch learning on GPU when available.
+
+\section{Results}
+
+\subsection{Training Performance}
+Figure~\ref{fig:loss} shows the training loss across epochs. The decreasing curve indicates that the model is learning useful features from the CT patches.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{output1}
+\caption{Training Binary Cross-Entropy loss over epochs.}
+\label{fig:loss}
+\end{figure}
+
+\subsection{Patch-Level Prediction}
+Figure~\ref{fig:patch} shows an example CT patch and the predicted nodule probability. The model gives a relatively high confidence to the candidate region.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{output2}
+\caption{Example CT patch with predicted nodule probability.}
+\label{fig:patch}
+\end{figure}
+
+\subsection{Anomaly Visualization}
+To better understand the model behavior, absolute error maps are visualized for several slices of the 3D patch, as shown in Figure~\ref{fig:anomaly}. Bright regions indicate areas that strongly influence the prediction.
+
+\begin{figure*}[htbp]
+\centering
+
+\begin{subfigure}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{output3}
+    \caption{Slice 6}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{output4}
+    \caption{Slice 16}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{output5}
+    \caption{Slice 26}
+\end{subfigure}
+
+\caption{Anomaly maps of different slices from the 3D CT patch.}
+\label{fig:anomaly}
+\end{figure*}
+
+\section{Discussion}
+The results show that the proposed 3D CNN is able to learn useful volumetric patterns from CT data. The training loss decreases steadily, which indicates that the model is learning during training. However, the current system still has several limitations.
+
+First, the dataset used in this study is relatively small and contains few negative samples. Second, the model architecture is simple and may not capture all types of nodules. Third, full-scan detection and FROC evaluation are not included in this work.
+
+In the future, performance may be improved by using hard negative mining, deeper networks such as 3D U-Net, multi-scale patch extraction, and more comprehensive evaluation metrics.
+
+\section{Conclusion}
+This study presented a baseline deep learning approach for pulmonary nodule detection using a 3D convolutional neural network. The model can learn from CT patches and produce reasonable probability predictions. Although the current performance is still limited, the proposed pipeline provides a useful starting point for future improvements toward more reliable lung nodule detection systems.
+
+\section{References}
+\begin{thebibliography}{1}
+
+\bibitem{luna16}
+LUNA16 Grand Challenge, “LUng Nodule Analysis 2016,” [Online]. Available: \url{https://luna16.grand-challenge.org/}
+
+\bibitem{dsb2017}
+Data Science Bowl 2017, Kaggle Competition, “Lung Cancer Detection,” [Online]. Available: \url{https://www.kaggle.com/c/data-science-bowl-2017}
+
+\end{thebibliography}
+
+\end{document}
