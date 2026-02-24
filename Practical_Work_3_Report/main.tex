@@ -1,0 +1,134 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[hidelinks]{hyperref}
+\graphicspath{{output/}}
+
+\title{COVID-19 Infection Segmentation from Chest X-ray Images Using Deep Learning}
+
+\author{
+\IEEEauthorblockN{Pham Minh Duc (22BA13083)}
+\IEEEauthorblockA{
+Machine Learning in Medicine 2026 \\
+University of Science and Technology of Hanoi (USTH) \\
+Email: ducpm.22ba13083@usth.edu.vn}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Automatic detection of COVID-19 infection regions from chest X-ray images can support fast and consistent clinical assessment. However, manual annotation of infection areas is time-consuming and depends on expert experience. This study proposes a deep learning-based segmentation approach to identify infection regions in chest X-ray images. The model is trained to predict pixel-wise infection masks and evaluated using Dice coefficient and loss curves. Experimental results show that the network is able to learn infection patterns, although segmentation quality is still limited and requires further improvement for reliable clinical use.
+\end{abstract}
+
+\section{Introduction}
+Chest X-ray imaging has been widely used for screening and monitoring respiratory diseases, including COVID-19. Detecting infection regions in X-ray images helps clinicians evaluate disease severity and progression. However, manual delineation of infection areas is labor-intensive and may vary between radiologists.
+
+With recent progress in deep learning, convolutional neural networks have shown strong performance in medical image segmentation. In this work, we investigate an automatic infection segmentation pipeline for chest X-ray images and analyze its performance using both quantitative and qualitative results.
+
+\section{Dataset}
+This study uses a public COVID-19 chest X-ray dataset that contains:
+
+\begin{itemize}
+    \item Chest X-ray images
+    \item Corresponding infection masks
+\end{itemize}
+
+The data is divided into training and validation sets. All images and masks are resized and normalized before being fed into the model.
+
+\section{Methods}
+
+\subsection{Preprocessing}
+The preprocessing pipeline includes:
+
+\begin{itemize}
+    \item Converting images to grayscale (if needed)
+    \item Resizing images to a fixed resolution
+    \item Normalizing pixel values to the range $[0,1]$
+    \item Converting masks to binary format
+\end{itemize}
+
+\subsection{Model Architecture}
+A convolutional encoder--decoder segmentation network is used to predict infection masks. The model learns spatial features from chest X-ray images and outputs a probability map representing infection likelihood at each pixel.
+
+\subsection{Training Procedure}
+The model is trained using mini-batch gradient descent with the Adam optimizer. Binary segmentation loss is used during training. Performance is monitored using:
+
+\begin{itemize}
+    \item Training and validation loss
+    \item Dice coefficient
+\end{itemize}
+
+\section{Results}
+
+\subsection{Input and Ground Truth}
+Figure~\ref{fig:inputmask} shows an example chest X-ray image and its corresponding infection mask.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{output1}
+\caption{Example chest X-ray image and infection mask.}
+\label{fig:inputmask}
+\end{figure}
+
+\subsection{Training Behavior}
+Figure~\ref{fig:loss} presents the training and validation loss curves. The loss generally decreases over epochs, indicating that the model is learning useful features.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{output2}
+\caption{Training and validation loss curves.}
+\label{fig:loss}
+\end{figure}
+
+\subsection{Dice Score Performance}
+Figure~\ref{fig:dice} shows the Dice coefficient across epochs. Although the score improves slightly in later epochs, the overall value remains moderate, suggesting that segmentation quality is still limited.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{output3}
+\caption{Segmentation Dice score over epochs.}
+\label{fig:dice}
+\end{figure}
+
+\subsection{Qualitative Segmentation Results}
+Figure~\ref{fig:segresults} displays several examples of infection segmentation results. The model is able to highlight major infected regions but still produces blurry boundaries and some false positives.
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=\textwidth]{output4}
+\caption{Infection segmentation results (X-ray, ground truth, and prediction).}
+\label{fig:segresults}
+\end{figure*}
+
+\subsection{Overlay Visualization}
+Figure~\ref{fig:overlay} shows the predicted infection areas overlaid on the original X-ray images. The highlighted regions generally correspond to abnormal lung areas, but the predictions are sometimes over-smoothed.
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=\textwidth]{output5}
+\caption{Predicted infection area overlay on chest X-ray images.}
+\label{fig:overlay}
+\end{figure*}
+
+\section{Discussion}
+The experimental results indicate that the proposed segmentation model can learn basic infection patterns from chest X-ray images. The decreasing loss curve confirms stable training. However, the Dice score remains relatively low, and qualitative results reveal blurry boundaries and occasional false detections.
+
+Several factors may explain these limitations. First, chest X-ray infection patterns are often subtle and vary significantly across patients. Second, the dataset size is limited. Third, the current model capacity may be insufficient to capture fine-grained details.
+
+Future improvements may include stronger data augmentation, deeper U-Net style architectures, attention mechanisms, and better loss functions such as Dice loss or focal loss.
+
+\section{Conclusion}
+This work presented a deep learning approach for automatic COVID-19 infection segmentation from chest X-ray images. The model demonstrates the ability to identify infected regions, but performance is not yet clinically reliable. Future work will focus on improving segmentation accuracy and robustness.
+
+\section{References}
+\begin{thebibliography}{1}
+
+\bibitem{covidqu}
+Anas Mohammed Tahir, “COVID-QU-Ex Dataset,” Kaggle. [Online]. Available: \url{https://www.kaggle.com/datasets/anasmohammedtahir/covidqu}
+
+\end{thebibliography}
+
+\end{document}
